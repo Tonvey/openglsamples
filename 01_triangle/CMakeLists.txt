@@ -1,0 +1,5 @@
+project(01_triangle)
+set(PROJECT_SRCS ${PROJECT_SRCS} ./01_triangle.c)
+add_executable(${PROJECT_NAME} ${PROJECT_SRCS})
+#target_link_libraries(01_triangle ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES} ${COCOA_LIB})
+target_link_libraries(${PROJECT_NAME} ${EXTRA_LIBS})
