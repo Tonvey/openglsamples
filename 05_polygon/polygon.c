@@ -43,6 +43,9 @@ void render()
     glPolygonMode(GL_FRONT,GL_LINE); //正面使用线条
     glPolygonMode(GL_BACK,GL_FILL);//背面使用填充模式
 
+    //设置正反面
+    //glFrontFace(GL_CW);
+
     glFlush();
     glutSwapBuffers();
 }
