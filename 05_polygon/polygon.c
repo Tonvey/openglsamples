@@ -21,6 +21,12 @@ void render()
     glClear(GL_COLOR_BUFFER_BIT);
     glColor3f(1.0,1,1);
 
+    //开启剔除
+    glEnable(GL_CULL_FACE);
+    //剔除正面
+    //glCullFace(GL_FRONT);
+    //剔除反面 
+    //glCullFace(GL_BACK);
 
     glBegin(GL_TRIANGLES);
     //顺时针方向画图形
@@ -40,11 +46,13 @@ void render()
     }
     glEnd();
 
-    glPolygonMode(GL_FRONT,GL_LINE); //正面使用线条
-    glPolygonMode(GL_BACK,GL_FILL);//背面使用填充模式
-
     //设置正反面
-    //glFrontFace(GL_CW);
+    //glFrontFace(GL_CCW);//逆时针counter clock wise
+    //glFrontFace(GL_CW);//顺时针
+
+//    glPolygonMode(GL_FRONT,GL_LINE); //正面使用线条
+//    glPolygonMode(GL_BACK,GL_FILL);//背面使用填充模式
+
 
     glFlush();
     glutSwapBuffers();
