@@ -4,7 +4,7 @@
 #   include <OpenGL/gl.h>
 #   include <OpenGL/glu.h>
 #else
-#   include <gl/glut.h>
+#   include <GL/glut.h>
 #endif
 #include <stdio.h>
 
