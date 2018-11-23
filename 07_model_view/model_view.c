@@ -13,19 +13,21 @@ void (*idle_func)()=idle;
 
 void render()
 {
-    //TODO:没验证
-    gluPerspective(1, 1, 0.1f, 100.f);
-//    gluLookAt(0.0f, 0.0f,4.0f,
-//              0.0f, 0.0f, 0.0f,
-//              1.0f, 1.0f, 0.0f);
-//    glViewport(0, 0, 200, 200);
     glClear(GL_COLOR_BUFFER_BIT);
     glShadeModel(GL_SMOOTH);
-    glMatrixMode(GL_MODELVIEW);
 
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(90, 1, 0.1f, 10.f);
+    gluLookAt(0.0f, 0.0f,1.0f,
+              0.0f, 0.0f, 0.0f,
+              0.0f, 1.0f, -1.0f);
+    //glViewport(0, 0, 400, 400);
+
+    glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
-    glTranslatef(0,0.2,-0.5);
+    glTranslatef(0,0,-0.5);
     glBegin(GL_TRIANGLES);
     {
         glColor3f(1,0,0);
@@ -38,6 +40,7 @@ void render()
 
     //右手坐标系的旋转
     glPushMatrix();
+    glLoadIdentity();
     glRotatef(30,0,0,1);
     glBegin(GL_TRIANGLES);
     {
@@ -50,6 +53,7 @@ void render()
     glPopMatrix();
 
     glPushMatrix();
+    glLoadIdentity();
     glTranslatef(-0.5,0,0);
     glScalef(1,0.5,0.5);
     glRotatef(30,0,0,1);
