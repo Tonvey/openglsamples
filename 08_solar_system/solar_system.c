@@ -1,8 +1,9 @@
 #include "MyStudyHeaders.h"
 #include <math.h>
-static unsigned long frame=0;
-static int days=0;
-
+#include <time.h>
+typedef float mytime_t;
+static mytime_t last_time;
+static mytime_t elapse;
 
 void render();
 void reshape(int width,int height);
@@ -15,6 +16,15 @@ void (*init_func)(int argc , char **argv)=init;
 void (*display_func)()=display;
 void (*reshape_func)(int,int)=reshape;
 void (*idle_func)()=idle;
+
+mytime_t updateElapse()
+{
+    clock_t this_time;
+    this_time=clock();
+    elapse = (mytime_t)(this_time-last_time)/CLOCKS_PER_SEC;
+    last_time=this_time;
+    return elapse;
+}
 
 typedef struct Point
 {
@@ -34,9 +44,9 @@ void init(int argc , char **argv)
 
 void timeFunc(int value)
 {
-    ++frame;
-    days++;
-    glutTimerFunc(100,timeFunc,10);
+    //垂直同步
+    glutTimerFunc(1000/60,timeFunc,10);
+    updateElapse();
     render();
 }
 
@@ -79,6 +89,7 @@ void drawBall(float radius,float r,float g,float b)
 }
 void render()
 {
+    //MY_LOG_DEBUG("elapse:%f\n",elapse);
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     glShadeModel(GL_SMOOTH);
 
@@ -98,13 +109,17 @@ void render()
     drawBall(0.2,1,0,0);
 
     //earth 
-    glRotatef(10*days,0,1,0);
+    static float earth_rot=0;
+    earth_rot += 40*elapse;
+    glRotatef(earth_rot,0,1,0);
     glTranslatef(0.5,0,0);
     glPushMatrix();
     drawBall(0.1,0,0,1);
 
     //moon
-    glRotatef(20*days,0,1,0);
+    static float moon_rot=0;
+    moon_rot += 80*elapse;
+    glRotatef(moon_rot,0,1,0);
     glTranslatef(0.2,0,0);
     drawBall(0.05,0,1,0);
 
@@ -114,17 +129,11 @@ void render()
 }
 void reshape(int width,int height)
 {
-//    MY_LOG_DEBUG("display:%ld\n",++frame);
-    render();
 }
 void display()
 {
-//    MY_LOG_DEBUG("display:%ld\n",++frame);
-    render();
 }
 
 void idle()
 {
-//    MY_LOG_DEBUG("idle:%ld\n",++frame);
-    render();
 }
