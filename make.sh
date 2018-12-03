@@ -5,5 +5,4 @@ then
     mkdir "$curPath/build"
 fi
 pushd "$curPath/build"
-cmake .. && make
-popd
+cmake .. && make 
