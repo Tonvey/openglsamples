@@ -14,10 +14,13 @@ void ApplicationBase::printOpenGLInfo()
 ApplicationBase::ApplicationBase(int argc,char **argv)
     :mWindow(nullptr)
 {
-    this->init(argc,argv);
+    for(int i = 0 ; i< argc ; ++i)
+    {
+        this->mArgvs.push_back(argv[i]);
+    }
 }
 
-int ApplicationBase::init(int argc ,char **argv)
+int ApplicationBase::init()
 {
     glfwSetErrorCallback([](int error , const char *description){
                              //this->openGLErrorCallBack(error,description);
@@ -35,7 +38,7 @@ int ApplicationBase::init(int argc ,char **argv)
     this->mWindow = glfwCreateWindow(
         640,
         480,
-        argv[0],
+        this->mArgvs[0].c_str(),
         NULL,
         NULL
         );
@@ -67,6 +70,7 @@ void ApplicationBase::openGLErrorCallBack(int error, const char *description)
 
 int ApplicationBase::run()
 {
+    this->init();
     printOpenGLInfo();
     clock_t last_time = clock();
     while (!glfwWindowShouldClose(this->mWindow))

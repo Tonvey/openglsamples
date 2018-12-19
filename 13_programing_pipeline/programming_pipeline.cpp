@@ -4,7 +4,6 @@
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
-#include <vector>
 #include "FileUtil.h"
 using namespace std;
 
@@ -22,16 +21,23 @@ public:
     Application(int argc , char **argv)
         :ApplicationBase(argc,argv)
     {
+    }
+    int init()override
+    {
+        ApplicationBase::init();
         //加载shader
-        myProgramId = loadShader();
+        myProgramId = loadShader(
+            FileUtil::getFileDirName(__FILE__) + FileUtil::pathChar + VERTEX_FILE_NAME,
+            FileUtil::getFileDirName(__FILE__) + FileUtil::pathChar + FRAG_FILE_NAME
+            );
 
         vertexPosition_modelspaceID = 
             glGetAttribLocation(myProgramId,"vertexPosition_modelspace");
 
         const GLfloat g_vertex_buffer_data[]={
-                                              -1.0f,-1.0f,0.0f,
-                                              1.0f,-1.0f,0.0f,
-                                              0.0f,1.0f,0.0f
+            -1.0f,-1.0f,0.0f,
+            1.0f,-1.0f,0.0f,
+            0.0f,1.0f,0.0f
         };
         //在显卡中申请内存，内存句柄是vertexbuffer
         glGenBuffers(1,&vertexbuffer);
@@ -44,8 +50,9 @@ public:
                      g_vertex_buffer_data,
                      GL_STATIC_DRAW
                      );
+        return 0;
     }
-    GLuint loadShader()
+    GLuint loadShader(string vertShaderFile,string fragShaderFile)
     {
         //创建顶点shader
         GLuint vertexShaderId = glCreateShader(GL_VERTEX_SHADER);
@@ -54,13 +61,15 @@ public:
         GLuint fragShaderId = glCreateShader(GL_FRAGMENT_SHADER);
 
         string vertexShaderCode;
-        ifstream vertexShaderStream(FileUtil::getFileDirName(__FILE__) + FileUtil::pathChar + VERTEX_FILE_NAME,std::ios::in);
+        ifstream vertexShaderStream(vertShaderFile,std::ios::in);
         if(vertexShaderStream.is_open())
         {
-            string line = "";
-            while(getline(vertexShaderStream,line))
+            char buf[1024];
+            memset(buf,0,sizeof(buf));
+            while(!vertexShaderStream.eof())
             {
-                vertexShaderCode += "\n"+line;
+                vertexShaderStream.read(buf,sizeof(buf)-1);
+                vertexShaderCode += buf;
             }
             vertexShaderStream.close();
         }
@@ -71,13 +80,15 @@ public:
         }
 
         string fragShaderCode;
-        ifstream fragShaderStream(FileUtil::getFileDirName(__FILE__) + FileUtil::pathChar + FRAG_FILE_NAME,std::ios::in);
+        ifstream fragShaderStream(fragShaderFile,std::ios::in);
         if(fragShaderStream.is_open())
         {
-            string line = "";
-            while(getline(fragShaderStream,line))
+            char buf[1024];
+            memset(buf,0,sizeof(buf));
+            while(!fragShaderStream.eof())
             {
-                fragShaderCode += "\n"+line;
+                fragShaderStream.read(buf,sizeof(buf)-1);
+                fragShaderCode += buf;
             }
             fragShaderStream.close();
         }
@@ -94,14 +105,15 @@ public:
 
         //检查编译结果
         GLint Result = GL_FALSE;
-        int InfoLogLength;
+        int infoLogLength;
+        char infoLogBuf[GL_INFO_LOG_LENGTH];
         glGetShaderiv(vertexShaderId,GL_COMPILE_STATUS,&Result);
-        glGetShaderiv(vertexShaderId,GL_INFO_LOG_LENGTH,&InfoLogLength);
-        if(InfoLogLength>0)
+        glGetShaderiv(vertexShaderId,GL_INFO_LOG_LENGTH,&infoLogLength);
+        if(infoLogLength>0)
         {
-            vector<char> vertexShaderErrorMessage(InfoLogLength+1);
-            glGetShaderInfoLog(vertexShaderId,InfoLogLength,NULL,&vertexShaderErrorMessage[0]);
-            cout<<&vertexShaderErrorMessage[0]<<endl;
+            memset(infoLogBuf,0,sizeof(infoLogBuf));
+            glGetShaderInfoLog(vertexShaderId,infoLogLength,NULL,infoLogBuf);
+            cerr<<infoLogBuf<<endl;
         }
 
         //编译frag shader
@@ -111,12 +123,12 @@ public:
 
         //检查编译结果
         glGetShaderiv(fragShaderId,GL_COMPILE_STATUS,&Result);
-        glGetShaderiv(fragShaderId,GL_INFO_LOG_LENGTH,&InfoLogLength);
-        if(InfoLogLength>0)
+        glGetShaderiv(fragShaderId,GL_INFO_LOG_LENGTH,&infoLogLength);
+        if(infoLogLength>0)
         {
-            vector<char> fragShaderErrorMessage(InfoLogLength+1);
-            glGetShaderInfoLog(fragShaderId,InfoLogLength,NULL,&fragShaderErrorMessage[0]);
-            cout<<&fragShaderErrorMessage[0]<<endl;
+            memset(infoLogBuf,0,sizeof(infoLogBuf));
+            glGetShaderInfoLog(fragShaderId,infoLogLength,NULL,infoLogBuf);
+            cout<<infoLogBuf<<endl;
         }
 
         //创建程序连接两个shader，得到程序id
@@ -127,12 +139,12 @@ public:
 
         //检查结果
         glGetProgramiv(programId,GL_LINK_STATUS,&Result);
-        glGetShaderiv(programId,GL_INFO_LOG_LENGTH,&InfoLogLength);
-        if(InfoLogLength>0)
+        glGetShaderiv(programId,GL_INFO_LOG_LENGTH,&infoLogLength);
+        if(infoLogLength>0)
         {
-            vector<char> programErrorMessage(InfoLogLength+1);
-            glGetShaderInfoLog(programId,InfoLogLength,NULL,&programErrorMessage[0]);
-            cout<<&programErrorMessage[0]<<endl;
+            memset(infoLogBuf,0,sizeof(infoLogBuf));
+            glGetShaderInfoLog(programId,infoLogLength,NULL,infoLogBuf);
+            cout<<infoLogBuf<<endl;
         }
 
         //删除两个shader
@@ -142,7 +154,7 @@ public:
         glDeleteShader(fragShaderId);
         return programId;
     }
-    void render(double elapse)
+    void render(double elapse) override
     {
         glClearColor(0,0,0.4,1.0);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -153,13 +165,13 @@ public:
         glEnableVertexAttribArray(vertexPosition_modelspaceID);
         //指定渲染时候，怎么对属性进行设置
         glVertexAttribPointer(
-                              vertexPosition_modelspaceID,
-                              3,
-                              GL_FLOAT,
-                              GL_FALSE,
-                              0,
-                              (void*)0
-                              );
+            vertexPosition_modelspaceID,
+            3,
+            GL_FLOAT,
+            GL_FALSE,
+            0,
+            (void*)0
+        );
 
         //绘制顶点数组，绘制三个顶点
         glDrawArrays(GL_TRIANGLES,0,3);
