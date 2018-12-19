@@ -1,0 +1,5 @@
+project(13_programming_pipeline)
+set(CMAKE_CXX_STANDARD 11)
+set(PROJECT_SRCS ${PROJECT_SRCS} ./programming_pipeline.cpp)
+add_executable(${PROJECT_NAME} ${PROJECT_SRCS})
+target_link_libraries(${PROJECT_NAME} ${EXTRA_LIBS})
