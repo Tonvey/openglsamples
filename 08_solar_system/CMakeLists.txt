@@ -1,5 +1,4 @@
 project(08_solar_system)
-set(PROJECT_SRCS ${PROJECT_SRCS} ./solar_system.c)
+set(PROJECT_SRCS ${PROJECT_SRCS} ./solar_system.cpp)
 add_executable(${PROJECT_NAME} ${PROJECT_SRCS})
-#target_link_libraries(01_triangle ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES} ${COCOA_LIB})
 target_link_libraries(${PROJECT_NAME} ${EXTRA_LIBS})

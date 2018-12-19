@@ -7,7 +7,6 @@
 #   include <GL/glut.h>
 #endif
 #include <stdio.h>
-
-
+#include <GLFW/glfw3.h>
 
 #define MY_LOG_DEBUG(...) do{printf(__VA_ARGS__);fflush(stdout);}while(0)
