@@ -1,9 +1,5 @@
 #include "ApplicationBase.h"
 #include <cmath>
-void render()
-{
-    glutSwapBuffers();
-}
 class Application: public ApplicationBase
 {
 public:
