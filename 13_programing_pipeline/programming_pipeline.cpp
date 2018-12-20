@@ -2,8 +2,10 @@
 #include <string>
 #include <cmath>
 #include <cstdlib>
+#include <cstring>
 #include <iostream>
 #include <fstream>
+#include <memory>
 #include "FileUtil.h"
 using namespace std;
 
@@ -79,6 +81,28 @@ public:
             return 0;
         }
 
+        //编译vertex shader
+        const char *vertexShaderPointer = vertexShaderCode.c_str();
+        glShaderSource(vertexShaderId, 1, &vertexShaderPointer, NULL);
+        glCompileShader(vertexShaderId);
+
+        //检查编译结果
+        GLint result = GL_FALSE;
+        glGetShaderiv(vertexShaderId,GL_COMPILE_STATUS,&result);
+        if(result!=GL_TRUE)//编译出错
+        {
+            int infoLogLength;
+            glGetShaderiv(vertexShaderId,GL_INFO_LOG_LENGTH,&infoLogLength);
+            if(infoLogLength>0)
+            {
+                char *infoLogBuf = new char[infoLogLength+1];
+                unique_ptr<char[]> u(infoLogBuf);
+                infoLogBuf[infoLogLength] = '\0';
+                glGetShaderInfoLog(vertexShaderId,infoLogLength,NULL,infoLogBuf);
+                cerr<<infoLogBuf<<endl;
+            }
+        }
+
         string fragShaderCode;
         ifstream fragShaderStream(fragShaderFile,std::ios::in);
         if(fragShaderStream.is_open())
@@ -98,23 +122,6 @@ public:
             return 0;
         }
 
-        //编译vertex shader
-        const char *vertexShaderPointer = vertexShaderCode.c_str();
-        glShaderSource(vertexShaderId, 1, &vertexShaderPointer, NULL);
-        glCompileShader(vertexShaderId);
-
-        //检查编译结果
-        GLint Result = GL_FALSE;
-        int infoLogLength;
-        char infoLogBuf[GL_INFO_LOG_LENGTH];
-        glGetShaderiv(vertexShaderId,GL_COMPILE_STATUS,&Result);
-        glGetShaderiv(vertexShaderId,GL_INFO_LOG_LENGTH,&infoLogLength);
-        if(infoLogLength>0)
-        {
-            memset(infoLogBuf,0,sizeof(infoLogBuf));
-            glGetShaderInfoLog(vertexShaderId,infoLogLength,NULL,infoLogBuf);
-            cerr<<infoLogBuf<<endl;
-        }
 
         //编译frag shader
         const char *fragShaderPointer = fragShaderCode.c_str();
@@ -122,13 +129,19 @@ public:
         glCompileShader(fragShaderId);
 
         //检查编译结果
-        glGetShaderiv(fragShaderId,GL_COMPILE_STATUS,&Result);
-        glGetShaderiv(fragShaderId,GL_INFO_LOG_LENGTH,&infoLogLength);
-        if(infoLogLength>0)
+        glGetShaderiv(fragShaderId,GL_COMPILE_STATUS,&result);
+        if(result!=GL_TRUE)//编译出错
         {
-            memset(infoLogBuf,0,sizeof(infoLogBuf));
-            glGetShaderInfoLog(fragShaderId,infoLogLength,NULL,infoLogBuf);
-            cout<<infoLogBuf<<endl;
+            int infoLogLength;
+            glGetShaderiv(fragShaderId,GL_INFO_LOG_LENGTH,&infoLogLength);
+            if(infoLogLength>0)
+            {
+                char *infoLogBuf = new char[infoLogLength+1];
+                unique_ptr<char[]> u(infoLogBuf);
+                infoLogBuf[infoLogLength] = '\0';
+                glGetShaderInfoLog(fragShaderId,infoLogLength,NULL,infoLogBuf);
+                cerr<<infoLogBuf<<endl;
+            }
         }
 
         //创建程序连接两个shader，得到程序id
@@ -138,13 +151,19 @@ public:
         glLinkProgram(programId);
 
         //检查结果
-        glGetProgramiv(programId,GL_LINK_STATUS,&Result);
-        glGetShaderiv(programId,GL_INFO_LOG_LENGTH,&infoLogLength);
-        if(infoLogLength>0)
+        glGetProgramiv(programId,GL_LINK_STATUS,&result);
+        if(result!=GL_TRUE)//编译出错
         {
-            memset(infoLogBuf,0,sizeof(infoLogBuf));
-            glGetShaderInfoLog(programId,infoLogLength,NULL,infoLogBuf);
-            cout<<infoLogBuf<<endl;
+            int infoLogLength;
+            glGetProgramiv(programId,GL_INFO_LOG_LENGTH,&infoLogLength);
+            if(infoLogLength>0)
+            {
+                char *infoLogBuf = new char[infoLogLength+1];
+                unique_ptr<char[]> u(infoLogBuf);
+                infoLogBuf[infoLogLength] = '\0';
+                glGetProgramInfoLog(programId,infoLogLength,NULL,infoLogBuf);
+                cerr<<infoLogBuf<<endl;
+            }
         }
 
         //删除两个shader
@@ -180,7 +199,6 @@ public:
 
         glfwSwapBuffers(this->mWindow);
     }
-
 };
 
 int main(int argc,char **argv)

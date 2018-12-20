@@ -7,5 +7,5 @@ attribute vec3 vertexPosition_modelspace;
 void main()
 {
     //gl_Position 是最终输出的位置，使用了其次坐标
-    gl_Position = vec4 ( vertexPosition_modelspace/2,1.0);
+    gl_Position = vec4 ( vertexPosition_modelspace,1.0);
 }
