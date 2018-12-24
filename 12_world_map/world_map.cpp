@@ -3,6 +3,10 @@
 #include <cmath>
 #include <cstdlib>
 #include <memory>
+#include <string>
+#include "FileUtil.h"
+
+#define WORLD_MAP_IMAG "world_map.bmp"
 using namespace std;
 class Application: public ApplicationBase
 {
@@ -23,26 +27,31 @@ public:
     Application(int argc , char **argv)
         :ApplicationBase(argc,argv)
     {
+    }
+
+    int init() override
+    {
+        ApplicationBase::init();
         glEnable(GL_TEXTURE_2D);
-        texture = loadBMPTexture("./11_texture/panda.bmp");
         //开启剔除，如果不开剔除，将会导致图片错乱
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
 
-        texture = loadBMPTexture("./12_world_map/world_map.bmp");
+        texture = loadBMPTexture(
+            FileUtil::getFileDirName(__FILE__) + FileUtil::pathChar + WORLD_MAP_IMAG);
         this->earth_rot=0.;
+        return 0;
     }
 
-    MyTexture loadBMPTexture(const char *fileName)
+    MyTexture loadBMPTexture(string fileName)
     {
         MyTexture t;
-        FILE *fp = fopen(fileName ,"rb");
+        FILE *fp = fopen(fileName.c_str() ,"rb");
         if(!fp)
         {
             perror("fopen");
             exit(1);
         }
-
         //跳过前面bmp文件头部
         char header[54];
         fread(header,54,1,fp);
@@ -171,5 +180,3 @@ int main(int argc,char **argv)
     Application app(argc,argv);
     return app.run();
 }
-float earth_rot=0;
-
