@@ -1,6 +1,7 @@
 #include "ApplicationBase.h"
 #include <iostream>
 #include <ctime>
+#include <fstream>
 using namespace std;
 
 void ApplicationBase::printOpenGLInfo()
@@ -13,6 +14,8 @@ void ApplicationBase::printOpenGLInfo()
 
 ApplicationBase::ApplicationBase(int argc,char **argv)
     :mWindow(nullptr)
+    ,mGLMajorVersion(2)
+    ,mGLMinorVersion(1)
 {
     for(int i = 0 ; i< argc ; ++i)
     {
@@ -31,8 +34,8 @@ int ApplicationBase::init()
     if (!glfwInit())
         exit(EXIT_FAILURE);
     //设置OpenGL的版本
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR,2);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,1);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR,this->mGLMajorVersion);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,this->mGLMinorVersion);
 
     //创建窗口
     this->mWindow = glfwCreateWindow(
@@ -84,4 +87,126 @@ int ApplicationBase::run()
         glfwPollEvents();
     }
     return 0;
+}
+GLuint ApplicationBase::loadShader(string vertShaderFile,string fragShaderFile)
+{
+    //创建顶点shader
+    GLuint vertexShaderId = glCreateShader(GL_VERTEX_SHADER);
+
+    //创建片段shader
+    GLuint fragShaderId = glCreateShader(GL_FRAGMENT_SHADER);
+
+    string vertexShaderCode;
+    ifstream vertexShaderStream(vertShaderFile,std::ios::in);
+    if(vertexShaderStream.is_open())
+    {
+        char buf[1024];
+        memset(buf,0,sizeof(buf));
+        while(!vertexShaderStream.eof())
+        {
+            vertexShaderStream.read(buf,sizeof(buf)-1);
+            vertexShaderCode += buf;
+        }
+        vertexShaderStream.close();
+    }
+    else
+    {
+        cerr<<"Can not open shader file "<<endl;
+        exit(-1);
+    }
+
+    //编译vertex shader
+    const char *vertexShaderPointer = vertexShaderCode.c_str();
+    glShaderSource(vertexShaderId, 1, &vertexShaderPointer, NULL);
+    glCompileShader(vertexShaderId);
+
+    //检查编译结果
+    GLint result = GL_FALSE;
+    glGetShaderiv(vertexShaderId,GL_COMPILE_STATUS,&result);
+    if(result!=GL_TRUE)//编译出错
+    {
+        int infoLogLength;
+        glGetShaderiv(vertexShaderId,GL_INFO_LOG_LENGTH,&infoLogLength);
+        if(infoLogLength>0)
+        {
+            char *infoLogBuf = new char[infoLogLength+1];
+            unique_ptr<char[]> u(infoLogBuf);
+            infoLogBuf[infoLogLength] = '\0';
+            glGetShaderInfoLog(vertexShaderId,infoLogLength,NULL,infoLogBuf);
+            cerr<<"Vertex shader info : "<<infoLogBuf<<endl;
+            exit(-1);
+        }
+    }
+
+    string fragShaderCode;
+    ifstream fragShaderStream(fragShaderFile,std::ios::in);
+    if(fragShaderStream.is_open())
+    {
+        char buf[1024];
+        memset(buf,0,sizeof(buf));
+        while(!fragShaderStream.eof())
+        {
+            fragShaderStream.read(buf,sizeof(buf)-1);
+            fragShaderCode += buf;
+        }
+        fragShaderStream.close();
+    }
+    else
+    {
+        cerr<<"Can not open shader file "<<endl;
+        exit(-1);
+    }
+
+
+    //编译frag shader
+    const char *fragShaderPointer = fragShaderCode.c_str();
+    glShaderSource(fragShaderId, 1, &fragShaderPointer, NULL);
+    glCompileShader(fragShaderId);
+
+    //检查编译结果
+    glGetShaderiv(fragShaderId,GL_COMPILE_STATUS,&result);
+    if(result!=GL_TRUE)//编译出错
+    {
+        int infoLogLength;
+        glGetShaderiv(fragShaderId,GL_INFO_LOG_LENGTH,&infoLogLength);
+        if(infoLogLength>0)
+        {
+            char *infoLogBuf = new char[infoLogLength+1];
+            unique_ptr<char[]> u(infoLogBuf);
+            infoLogBuf[infoLogLength] = '\0';
+            glGetShaderInfoLog(fragShaderId,infoLogLength,NULL,infoLogBuf);
+            cerr<<"Frag shader info : "<<infoLogBuf<<endl;
+            exit(-1);
+        }
+    }
+
+    //创建程序连接两个shader，得到程序id
+    GLuint programId = glCreateProgram();
+    glAttachShader(programId, vertexShaderId);
+    glAttachShader(programId, fragShaderId);
+    glLinkProgram(programId);
+
+    //检查结果
+    glGetProgramiv(programId,GL_LINK_STATUS,&result);
+    if(result!=GL_TRUE)//编译出错
+    {
+        int infoLogLength;
+        glGetProgramiv(programId,GL_INFO_LOG_LENGTH,&infoLogLength);
+        if(infoLogLength>0)
+        {
+            char *infoLogBuf = new char[infoLogLength+1];
+            unique_ptr<char[]> u(infoLogBuf);
+            infoLogBuf[infoLogLength] = '\0';
+            glGetProgramInfoLog(programId,infoLogLength,NULL,infoLogBuf);
+            cerr<<"Program info : "<<infoLogBuf<<endl;
+            exit(-1);
+        }
+    }
+
+    //删除两个shader
+    glDetachShader(programId,vertexShaderId);
+    glDetachShader(programId,fragShaderId);
+    glDeleteShader(vertexShaderId);
+    glDeleteShader(fragShaderId);
+    return programId;
 }

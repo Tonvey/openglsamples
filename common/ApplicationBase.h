@@ -12,8 +12,12 @@ public:
     virtual int run();
     virtual void render(double elapse);
     virtual void openGLErrorCallBack(int err,const char *description);
+    virtual GLuint loadShader(std::string vertShaderFile,std::string fragShaderFile);
     static void printOpenGLInfo();
+    virtual ~ApplicationBase()=default;
 protected:
     std::vector<std::string> mArgvs;
     GLFWwindow *mWindow;
+    int mGLMajorVersion;
+    int mGLMinorVersion;
 };
