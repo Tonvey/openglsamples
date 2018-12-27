@@ -1,4 +1,6 @@
-build
+build*
 *.user
 *.swp
 .ycm_extra_conf.py
+*.DS_Store
+*.user
