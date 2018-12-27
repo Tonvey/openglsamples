@@ -36,7 +36,7 @@ public:
         this->mGLMajorVersion=4;
         this->mGLMajorVersion=1;
     }
-    int init()override
+    void init()override
     {
         ApplicationBase::init();
 
@@ -95,7 +95,6 @@ public:
                      uvBufferData,
                      GL_STATIC_DRAW
                      );
-        return 0;
     }
     MyTexture loadBMPTexture(string fileName)
     {

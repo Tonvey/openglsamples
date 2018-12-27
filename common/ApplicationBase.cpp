@@ -23,7 +23,7 @@ ApplicationBase::ApplicationBase(int argc,char **argv)
     }
 }
 
-int ApplicationBase::init()
+void ApplicationBase::init()
 {
     glfwSetErrorCallback([](int error , const char *description){
                              //this->openGLErrorCallBack(error,description);
@@ -36,6 +36,8 @@ int ApplicationBase::init()
     //设置OpenGL的版本
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR,this->mGLMajorVersion);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,this->mGLMinorVersion);
+    // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy; should not be needed
+    // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); 
 
     //创建窗口
     this->mWindow = glfwCreateWindow(
@@ -60,7 +62,6 @@ int ApplicationBase::init()
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
     });
-    return 0;
 }
 void ApplicationBase::render(double elapse)
 {

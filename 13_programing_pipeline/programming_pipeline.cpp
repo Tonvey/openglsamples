@@ -23,7 +23,7 @@ public:
         :ApplicationBase(argc,argv)
     {
     }
-    int init()override
+    void init()override
     {
         ApplicationBase::init();
         //加载shader
@@ -51,7 +51,6 @@ public:
                      g_vertex_buffer_data,
                      GL_STATIC_DRAW
                      );
-        return 0;
     }
     void render(double elapse) override
     {

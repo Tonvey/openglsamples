@@ -18,6 +18,11 @@ public:
     Application(int argc , char **argv)
         :ApplicationBase(argc,argv)
     {
+    }
+
+    void init()override
+    {
+        ApplicationBase::init();
         glEnable(GL_TEXTURE_2D);
         texture = loadBMPTexture("./11_texture/panda.bmp");
     }

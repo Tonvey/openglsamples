@@ -29,7 +29,7 @@ public:
     {
     }
 
-    int init() override
+    void init() override
     {
         ApplicationBase::init();
         glEnable(GL_TEXTURE_2D);
@@ -40,7 +40,6 @@ public:
         texture = loadBMPTexture(
             FileUtil::getFileDirName(__FILE__) + FileUtil::pathChar + WORLD_MAP_IMAG);
         this->earth_rot=0.;
-        return 0;
     }
 
     MyTexture loadBMPTexture(string fileName)
