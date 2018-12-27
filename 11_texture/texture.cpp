@@ -13,7 +13,16 @@ public:
         GLuint name;
         GLuint width;
         GLuint height;
+        ~MyTexture()
+        {
+            if(glIsTexture(this->name)==GL_TRUE)
+            {
+                cout<<"Delete texture"<<endl;
+                glDeleteTextures(1,&this->name);
+            }
+        }
     };
+    typedef unique_ptr<MyTexture> TexturePtr ;
 
     Application(int argc , char **argv)
         :ApplicationBase(argc,argv)
@@ -27,9 +36,9 @@ public:
         texture = loadBMPTexture("./11_texture/panda.bmp");
     }
 
-    MyTexture loadBMPTexture(const char *fileName)
+    TexturePtr loadBMPTexture(const char *fileName)
     {
-        MyTexture t;
+        TexturePtr t(new MyTexture);
         FILE *fp = fopen(fileName ,"rb");
         if(!fp)
         {
@@ -42,16 +51,16 @@ public:
         fread(header,54,1,fp);
         // 数据格式
         // 宽度和高度
-        t.width = *(int*)(header + 0x12);
-        t.height = *(int*)(header + 0x16);
-        int bytes = (t.width) * (t.height) * 3;
+        t->width = *(int*)(header + 0x12);
+        t->height = *(int*)(header + 0x16);
+        int bytes = (t->width) * (t->height) * 3;
         char* data = new char[bytes];
         unique_ptr<char[]> dataGuard(data);
         fread(data, bytes, 1, fp);
         fclose(fp);
 
-        glGenTextures(1,&t.name);
-        glBindTexture(GL_TEXTURE_2D,t.name);
+        glGenTextures(1,&t->name);
+        glBindTexture(GL_TEXTURE_2D,t->name);
 
         // 纹理设置
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -65,8 +74,8 @@ public:
                      GL_TEXTURE_2D,
                      0,
                      GL_RGB,
-                     t.width,
-                     t.height,
+                     t->width,
+                     t->height,
                      0,
                      GL_BGR,
                      GL_UNSIGNED_BYTE,
@@ -81,7 +90,7 @@ public:
         glClearColor(0,0,0,1.0);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glBindTexture(GL_TEXTURE_2D,texture.name);
+        glBindTexture(GL_TEXTURE_2D,texture->name);
 
         glBegin(GL_QUADS);
         {
@@ -102,7 +111,7 @@ public:
         glfwSwapBuffers(this->mWindow);
     }
 private:
-    MyTexture texture;
+    TexturePtr texture;
 };
 
 int main(int argc,char **argv)
