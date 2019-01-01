@@ -61,6 +61,13 @@ void ApplicationBase::init()
     //绘制对象
     glfwMakeContextCurrent(this->mWindow);
 
+    //注意glewInit调用的时机，一定是创建完窗口后
+    GLenum err = glewInit();
+    if(err!= GLEW_OK) {
+        cerr<<glewGetErrorString(err)<<endl;
+        exit(EXIT_FAILURE);
+    }
+
     //垂直同步
     glfwSwapInterval(1);
     glfwSetKeyCallback(this->mWindow,[](GLFWwindow *window,int key,int scancode ,int action ,int mods){
