@@ -1,0 +1,5 @@
+project(16_glsl_var)
+set(CMAKE_CXX_STANDARD 11)
+set(PROJECT_SRCS ${PROJECT_SRCS} ./glsl_vao.cpp)
+add_executable(${PROJECT_NAME} ${PROJECT_SRCS})
+target_link_libraries(${PROJECT_NAME} ${EXTRA_LIBS})
