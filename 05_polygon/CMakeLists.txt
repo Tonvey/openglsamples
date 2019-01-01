@@ -1,5 +1,5 @@
 project(05_polygon)
-set(PROJECT_SRCS ${PROJECT_SRCS} ./polygon.cpp)
+set(PROJECT_SRCS ${PROJECT_SRCS} ./main.cpp)
 add_executable(${PROJECT_NAME} ${PROJECT_SRCS})
 #target_link_libraries(01_triangle ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES} ${COCOA_LIB})
 target_link_libraries(${PROJECT_NAME} ${EXTRA_LIBS})
