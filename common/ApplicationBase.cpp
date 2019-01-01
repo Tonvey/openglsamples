@@ -1,6 +1,8 @@
 #include "ApplicationBase.h"
 #include <iostream>
 #include <ctime>
+#include <cstring>
+#include <memory>
 #include <fstream>
 using namespace std;
 
