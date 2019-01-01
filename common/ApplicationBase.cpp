@@ -23,6 +23,11 @@ ApplicationBase::ApplicationBase(int argc,char **argv)
     }
 }
 
+void ApplicationBase::versionSelect()
+{
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR,this->mGLMajorVersion);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,this->mGLMinorVersion);
+}
 void ApplicationBase::init()
 {
     glfwSetErrorCallback([](int error , const char *description){
@@ -33,11 +38,9 @@ void ApplicationBase::init()
     //初始化glfw
     if (!glfwInit())
         exit(EXIT_FAILURE);
+
     //设置OpenGL的版本
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR,this->mGLMajorVersion);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,this->mGLMinorVersion);
-    // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy; should not be needed
-    // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); 
+    this->versionSelect();
 
     //创建窗口
     this->mWindow = glfwCreateWindow(

@@ -3,6 +3,10 @@
 #   include <GLUT/glut.h>
 #   include <OpenGL/gl.h>
 #   include <OpenGL/glu.h>
+#   define glGenVertexArrays(...) glGenVertexArraysAPPLE(__VA_ARGS__)
+#   define glDeleteVertexArrays(...) glDeleteFencesAPPLE(__VA_ARGS__)
+#   define glBindVertexArray(...) glBindVertexArrayAPPLE(__VA_ARGS__)
+#   define glIsVertexArray(...) glIsVertexArrayAPPLE(__VA_ARGS__)
 #else
 #define GL_GLEXT_PROTOTYPES
 #   include <GL/gl.h>

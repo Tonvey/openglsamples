@@ -10,6 +10,7 @@ public:
     ApplicationBase(int argc,char **argv);
     virtual void init();
     virtual int run();
+    virtual void versionSelect();
     virtual void render(double elapse);
     virtual void openGLErrorCallBack(int err,const char *description);
     virtual GLuint loadShader(std::string vertShaderFile,std::string fragShaderFile);
