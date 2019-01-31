@@ -79,7 +79,6 @@ public:
 
         glGenTextures(1,&t.name);
         glBindTexture(GL_TEXTURE_2D,t.name);
-        //glActiveTexture(t.name);
 
         // 纹理设置
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -152,7 +151,6 @@ public:
         glEnable(GL_TEXTURE_2D);
         texture = loadBMPTexture(
                                  FileUtil::getFileDirName(__FILE__) + FileUtil::pathChar + "panda.bmp");
-        glEnable(texture.name);
 
         textureId = 
             glGetUniformLocation(myProgramId,"myTextureSampler");
@@ -228,7 +226,6 @@ public:
                                (void*)0
                                );
 
-        glBindVertexArray(uvbo);
         glBindBuffer(GL_ARRAY_BUFFER,this->uvbo);
         glVertexAttribPointer(
                               uvId,
@@ -239,7 +236,6 @@ public:
                               (void*)0
                               );
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,this->ebo);
-        glBindTexture(GL_TEXTURE_2D,texture.name);
         //最后通过glDrawElements的方式来绘制
         glDrawElements(
                        GL_TRIANGLES,
