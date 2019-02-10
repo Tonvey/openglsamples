@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.2)
 project(StudyOpenGL)
 set(CMAKE_CXX_STANDARD 11)
 add_definitions(-g)
@@ -8,7 +8,12 @@ pkg_search_module(GLFW REQUIRED glfw3)
 pkg_search_module(GLEW REQUIRED glew)
 include_directories(${GLFW_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS})
 link_directories(${GLFW_LIBRARY_DIRS} ${GLEW_LIBRARY_DIRS})
-SET(EXTRA_LIBS ${GLFW_LIBRARIES} ${GLEW_LIBRARIES})
+SET(EXTRA_LIBS ${GLFW_LIBRARIES} ${GLEW_LIBRARIES} assimp)
+
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
+include_directories(./3rdparty/assimp/include)
+include_directories(./3rdparty/stb)
 
 IF(APPLE)
     FIND_LIBRARY(GLUT_LIBRARY GLUT )
@@ -25,6 +30,8 @@ ENDIF(CMAKE_SYSTEM_NAME MATCHES "Linux")
 
 file(GLOB PROJECT_SRCS ./common/*.cpp)
 include_directories(./common/)
+
+add_subdirectory(./3rdparty/assimp)
 
 add_definitions(-DGL_SILENCE_DEPRECATION)
 add_subdirectory(./01_triangle)
@@ -45,3 +52,4 @@ add_subdirectory(./15_glsl_texture)
 add_subdirectory(./16_glsl_vao)
 add_subdirectory(./17_glsl_ebo)
 add_subdirectory(./18_glsl_ebo_uv)
+add_subdirectory(./19_fbx_cube)

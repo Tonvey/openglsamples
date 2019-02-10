@@ -3,6 +3,8 @@
 #include <cmath>
 #include <cstdlib>
 #include <memory>
+#include "TextureLoader.h"
+#include "FileUtil.h"
 using namespace std;
 
 class Application: public ApplicationBase
@@ -33,34 +35,20 @@ public:
     {
         ApplicationBase::init();
         glEnable(GL_TEXTURE_2D);
-        texture = loadBMPTexture("./11_texture/panda.bmp");
+        texture = loadBMPTexture(
+        FileUtil::getFileDirName(__FILE__) + FileUtil::pathChar + "panda.bmp");
     }
 
-    TexturePtr loadBMPTexture(const char *fileName)
+    TexturePtr loadBMPTexture(string fileName)
     {
+        TextureLoader loader(fileName);
         TexturePtr t(new MyTexture);
-        FILE *fp = fopen(fileName ,"rb");
-        if(!fp)
-        {
-            perror("fopen");
-            exit(1);
-        }
-
-        //跳过前面bmp文件头部
-        char header[54];
-        fread(header,54,1,fp);
-        // 数据格式
-        // 宽度和高度
-        t->width = *(int*)(header + 0x12);
-        t->height = *(int*)(header + 0x16);
-        int bytes = (t->width) * (t->height) * 3;
-        char* data = new char[bytes];
-        unique_ptr<char[]> dataGuard(data);
-        fread(data, bytes, 1, fp);
-        fclose(fp);
+        t->width = loader.width();
+        t->height = loader.height();
 
         glGenTextures(1,&t->name);
         glBindTexture(GL_TEXTURE_2D,t->name);
+        MY_LOG_DEBUG("%d %d %d \n",loader.width(),loader.height(),loader.channelCount());
 
         // 纹理设置
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -73,13 +61,13 @@ public:
         glTexImage2D(
                      GL_TEXTURE_2D,
                      0,
-                     GL_RGB,
+                     loader.mode(),
                      t->width,
                      t->height,
                      0,
-                     GL_BGR,
+                     loader.mode(),
                      GL_UNSIGNED_BYTE,
-                     data);
+                     loader.data());
 
         return t;
     }
