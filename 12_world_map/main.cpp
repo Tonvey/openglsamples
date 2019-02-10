@@ -5,18 +5,13 @@
 #include <memory>
 #include <string>
 #include "FileUtil.h"
+#include "Texture.h"
 
 #define WORLD_MAP_IMAG "world_map.bmp"
 using namespace std;
 class Application: public ApplicationBase
 {
 public:
-    struct MyTexture
-    {
-        GLuint name;
-        GLuint width;
-        GLuint height;
-    };
     struct Point
     {
         float x;
@@ -37,57 +32,11 @@ public:
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
 
-        texture = loadBMPTexture(
-            FileUtil::getFileDirName(__FILE__) + FileUtil::pathChar + WORLD_MAP_IMAG);
+        texture = move(Texture(
+            FileUtil::getFileDirName(__FILE__) + FileUtil::pathChar + WORLD_MAP_IMAG));
         this->earth_rot=0.;
     }
 
-    MyTexture loadBMPTexture(string fileName)
-    {
-        MyTexture t;
-        FILE *fp = fopen(fileName.c_str() ,"rb");
-        if(!fp)
-        {
-            perror("fopen");
-            exit(1);
-        }
-        //跳过前面bmp文件头部
-        char header[54];
-        fread(header,54,1,fp);
-        // 数据格式
-        // 宽度和高度
-        t.width = *(int*)(header + 0x12);
-        t.height = *(int*)(header + 0x16);
-        int bytes = (t.width) * (t.height) * 3;
-        char* data = new char[bytes];
-        unique_ptr<char[]> dataGuard(data);
-        fread(data, bytes, 1, fp);
-        fclose(fp);
-
-        glGenTextures(1,&t.name);
-        glBindTexture(GL_TEXTURE_2D,t.name);
-
-        // 纹理设置
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-
-        // 把内存中的图像信息，发送给显卡
-        glTexImage2D(
-                     GL_TEXTURE_2D,
-                     0,
-                     GL_RGB,
-                     t.width,
-                     t.height,
-                     0,
-                     GL_BGR,
-                     GL_UNSIGNED_BYTE,
-                     data);
-
-        return t;
-    }
     void coordUV(int i , int j,  int slice)
     {
         glTexCoord2f(1.0*i/slice,1.0*j/slice);
@@ -123,7 +72,7 @@ public:
             {
                 for(j=0;j<slice;++j)
                 {
-                    glBindTexture(GL_TEXTURE_2D,texture.name);
+                    glBindTexture(GL_TEXTURE_2D,texture.id());
                     coordUV(i,j,slice);
                     glVertex3f(
                                vertexes[i][j].x,
@@ -170,7 +119,7 @@ public:
         glfwSwapBuffers(this->mWindow);
     }
 private:
-    MyTexture texture;
+    Texture texture;
     float earth_rot;
 };
 

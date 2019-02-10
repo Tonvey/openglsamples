@@ -6,6 +6,7 @@
 #include <iostream>
 #include <memory>
 #include "FileUtil.h"
+#include "Texture.h"
 using namespace std;
 #define VERTEX_FILE_NAME "shader.vert"
 #define FRAG_FILE_NAME "shader.frag"
@@ -31,13 +32,6 @@ const GLuint vertex_indices_data[]={
 
 class Application: public ApplicationCoreProfile
 {
-public:
-    struct MyTexture
-    {
-        GLuint name;
-        GLuint width;
-        GLuint height;
-    };
 private:
     GLuint myProgramId;
     GLuint vertexPosition;
@@ -47,59 +41,12 @@ private:
     GLuint uvbo;
     GLuint uvId;
     GLuint textureId;
-    MyTexture texture;
+    Texture texture;
 public:
 
     Application(int argc , char **argv)
         :ApplicationCoreProfile(argc,argv)
     {
-    }
-    MyTexture loadBMPTexture(string fileName)
-    {
-        MyTexture t;
-        FILE *fp = fopen(fileName.c_str(),"rb");
-        if(!fp)
-        {
-            perror("fopen");
-            exit(1);
-        }
-
-        //跳过前面bmp文件头部
-        char header[54];
-        fread(header,54,1,fp);
-        // 数据格式
-        // 宽度和高度
-        t.width = *(int*)(header + 0x12);
-        t.height = *(int*)(header + 0x16);
-        int bytes = (t.width) * (t.height) * 3;
-        char* data = new char[bytes];
-        unique_ptr<char[]> dataGuard(data);
-        fread(data, bytes, 1, fp);
-        fclose(fp);
-
-        glGenTextures(1,&t.name);
-        glBindTexture(GL_TEXTURE_2D,t.name);
-
-        // 纹理设置
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-
-        // 把内存中的图像信息，发送给显卡
-        glTexImage2D(
-                     GL_TEXTURE_2D,
-                     0,
-                     GL_RGB,
-                     t.width,
-                     t.height,
-                     0,
-                     GL_BGR,
-                     GL_UNSIGNED_BYTE,
-                     data);
-        glGenerateMipmap(t.name);
-        return t;
     }
     ~Application()
     {
@@ -117,11 +64,6 @@ public:
         {
             cout<<"Delete uvbo buffer"<<endl;
             glDeleteBuffers(1,&uvbo);
-        }
-        if(glIsTexture(this->texture.name))
-        {
-            cout<<"Delete texture sample"<<endl;
-            glDeleteTextures(1,&this->texture.name);
         }
         if(glIsVertexArray(vao)==GL_TRUE)
         {
@@ -149,8 +91,8 @@ public:
 
         //加载纹理图片
         glEnable(GL_TEXTURE_2D);
-        texture = loadBMPTexture(
-                                 FileUtil::getFileDirName(__FILE__) + FileUtil::pathChar + "panda.bmp");
+        texture = move(Texture(
+            FileUtil::getFileDirName(__FILE__) + FileUtil::pathChar + "panda.bmp"));
 
         textureId = 
             glGetUniformLocation(myProgramId,"myTextureSampler");
