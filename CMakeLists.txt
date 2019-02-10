@@ -33,7 +33,7 @@ include_directories(./common/)
 
 add_subdirectory(./3rdparty/assimp)
 
-add_definitions(-DGL_SILENCE_DEPRECATION)
+add_definitions(-DGL_SILENCE_DEPRECATION -DSTB_IMAGE_IMPLEMENTATION)
 add_subdirectory(./01_triangle)
 add_subdirectory(./02_circle)
 add_subdirectory(./03_star)
