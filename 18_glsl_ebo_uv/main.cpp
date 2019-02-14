@@ -7,7 +7,9 @@
 #include <memory>
 #include "FileUtil.h"
 #include "Texture.h"
+#include <glm/glm.hpp>
 using namespace std;
+using namespace glm;
 #define VERTEX_FILE_NAME "shader.vert"
 #define FRAG_FILE_NAME "shader.frag"
 
@@ -42,6 +44,7 @@ private:
     GLuint uvId;
     GLuint textureId;
     Texture texture;
+    GLuint idMVP;
 public:
 
     Application(int argc , char **argv)
@@ -144,10 +147,16 @@ public:
         //习惯性的解绑
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
 
+        this->idMVP = glGetUniformLocation(this->myProgramId,"mvp");
     }
 
     void render(double elapse) override
     {
+        this->computeMatrixesFromInput(elapse);
+        mat4 matModel(1.0);
+        mat4 mvp = this->mMatProjection * this->mMatView * matModel;
+        glUniformMatrix4fv(this->idMVP,1,GL_FALSE,&mvp[0][0]);
+
         glClearColor(0,0,0.4,1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

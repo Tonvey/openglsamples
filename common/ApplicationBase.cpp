@@ -68,6 +68,13 @@ void ApplicationBase::init()
         exit(EXIT_FAILURE);
     }
 
+    glfwSetInputMode(mWindow,GLFW_STICKY_KEYS,GL_TRUE);
+    glfwSetInputMode(mWindow,GLFW_CURSOR,GLFW_CURSOR_DISABLED);
+    glfwPollEvents();
+    int width,height;
+    glfwGetWindowSize (mWindow, &width, &height);
+    glfwSetCursorPos(mWindow, width/2, height/2);
+
     //垂直同步
     glfwSwapInterval(1);
     glfwSetKeyCallback(this->mWindow,[](GLFWwindow *window,int key,int scancode ,int action ,int mods){
