@@ -14,6 +14,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 include_directories(./3rdparty/assimp/include)
 include_directories(./3rdparty/stb)
+include_directories(./3rdparty/glm)
 
 IF(APPLE)
     FIND_LIBRARY(GLUT_LIBRARY GLUT )
