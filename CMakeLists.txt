@@ -6,9 +6,14 @@ add_definitions(-g)
 find_package(PkgConfig REQUIRED)
 pkg_search_module(GLFW REQUIRED glfw3)
 pkg_search_module(GLEW REQUIRED glew)
+pkg_search_module(MINIZIP REQUIRED minizip)
 include_directories(${GLFW_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS})
-link_directories(${GLFW_LIBRARY_DIRS} ${GLEW_LIBRARY_DIRS})
+link_directories(${GLFW_LIBRARY_DIRS} ${GLEW_LIBRARY_DIRS} ${MINIZIP_LIBRARY_DIRS})
 SET(EXTRA_LIBS ${GLFW_LIBRARIES} ${GLEW_LIBRARIES} assimp)
+
+IF(APPLE)
+set(CMAKE_MACOSX_RPATH 1)
+ENDIF (APPLE)
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
