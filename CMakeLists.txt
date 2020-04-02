@@ -34,8 +34,12 @@ IF(CMAKE_SYSTEM_NAME MATCHES "Linux")
     SET(EXTRA_LIBS ${EXTRA_LIBS} ${GLU_LIBRARIES} ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES} m)
 ENDIF(CMAKE_SYSTEM_NAME MATCHES "Linux")
 
-file(GLOB PROJECT_SRCS ./common/*.cpp)
+# TODO 这里有点乱,要调整,先将多个公共文件创建成为库,然后再连接给所有demo
 include_directories(./common/)
+file(GLOB FRAME_LIB_SRCS ./common/*.cpp)
+add_library(sframe ${FRAME_LIB_SRCS})
+target_link_libraries(sframe ${EXTRA_LIBS})
+SET(EXTRA_LIBS ${EXTRA_LIBS} sframe)
 
 add_subdirectory(./3rdparty/assimp)
 
