@@ -16,6 +16,8 @@ public:
     virtual GLuint loadShader(std::string vertShaderFile,std::string fragShaderFile);
     static void printOpenGLInfo();
     virtual ~ApplicationBase()=default;
+    static bool createVertexShader(const std::string fileName,GLuint &id);
+    static bool createFragmentShader(const std::string fileName,GLuint &id);
 protected:
     std::vector<std::string> mArgvs;
     GLFWwindow *mWindow;

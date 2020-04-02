@@ -109,7 +109,7 @@ public:
 
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        earth_rot += 10*elapse;
+        earth_rot += 100*elapse;
         glRotatef(earth_rot,0,1,0);
 
         glColor4f(1,1,1,1);
