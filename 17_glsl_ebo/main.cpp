@@ -25,7 +25,7 @@ const GLuint vertex_indices_data[]={
 class Application: public ApplicationCoreProfile
 {
 private:
-    GLuint myProgramId;
+    ShaderProgram program;
     GLuint vertexPosition;
     GLuint vbo;
     GLuint vao;
@@ -53,11 +53,6 @@ public:
             cout<<"Delete vao buffer"<<endl;
             glDeleteVertexArrays(1,&vao);
         }
-        if(glIsProgram(myProgramId)==GL_TRUE)
-        {
-            cout<<"Delete program"<<endl;
-            glDeleteProgram(myProgramId);
-        }
     }
 
     void init()override
@@ -67,13 +62,12 @@ public:
         // Accept fragment if it closer to the camera than the former one
         glDepthFunc(GL_LESS); 
         //加载shader
-        myProgramId = loadShader(
-            FileUtil::getFileDirName(__FILE__)+FileUtil::pathChar+VERTEX_FILE_NAME,
-            FileUtil::getFileDirName(__FILE__)+FileUtil::pathChar+FRAG_FILE_NAME
-            );
+        program = loadShader(
+                             FileUtil::getFileDirName(__FILE__) + FileUtil::pathChar + VERTEX_FILE_NAME,
+                             FileUtil::getFileDirName(__FILE__) + FileUtil::pathChar + FRAG_FILE_NAME);
 
         vertexPosition= 
-            glGetAttribLocation(myProgramId,"vertexPosition");
+            program.getAttr("vertexPosition");
 
         //在显卡中申请内存，内存句柄是vertexbuffer
         //VAO创建
@@ -110,7 +104,7 @@ public:
         glClearColor(0,0,0.4,1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glUseProgram(this->myProgramId);
+        program.use();
         glEnableVertexAttribArray(vertexPosition);
 
         //在draw之前一定要绑定好vao以及GL_ARRAY_BUFFER和GL_ELEMENT_ARRAY_BUFFER

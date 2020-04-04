@@ -1,8 +1,9 @@
 #pragma once
 
-#include "MyStudyHeaders.h"
 #include <vector>
 #include <string>
+#include "MyStudyHeaders.h"
+#include "ShaderPrograme.h"
 
 class ApplicationBase
 {
@@ -13,7 +14,7 @@ public:
     virtual void versionSelect();
     virtual void render(double elapse);
     virtual void openGLErrorCallBack(int err,const char *description);
-    virtual GLuint loadShader(std::string vertShaderFile,std::string fragShaderFile);
+    static ShaderProgram loadShader(std::string vertShaderFile,std::string fragShaderFile);
     static void printOpenGLInfo();
     virtual ~ApplicationBase()=default;
     static bool createVertexShader(const std::string fileName,GLuint &id);

@@ -35,7 +35,7 @@ const GLuint vertex_indices_data[]={
 class Application: public ApplicationCoreProfile
 {
 private:
-    GLuint myProgramId;
+    ShaderProgram program;
     GLuint vertexPosition;
     GLuint vbo;
     GLuint vao;
@@ -73,11 +73,6 @@ public:
             cout<<"Delete vao buffer"<<endl;
             glDeleteVertexArrays(1,&vao);
         }
-        if(glIsProgram(myProgramId)==GL_TRUE)
-        {
-            cout<<"Delete program"<<endl;
-            glDeleteProgram(myProgramId);
-        }
     }
 
     void init()override
@@ -87,23 +82,22 @@ public:
         // Accept fragment if it closer to the camera than the former one
         glDepthFunc(GL_LESS); 
         //加载shader
-        myProgramId = loadShader(
-            FileUtil::getFileDirName(__FILE__)+FileUtil::pathChar+VERTEX_FILE_NAME,
-            FileUtil::getFileDirName(__FILE__)+FileUtil::pathChar+FRAG_FILE_NAME
-            );
+        program = loadShader(
+                             FileUtil::getFileDirName(__FILE__) + FileUtil::pathChar + VERTEX_FILE_NAME,
+                             FileUtil::getFileDirName(__FILE__) + FileUtil::pathChar + FRAG_FILE_NAME);
 
         //加载纹理图片
         glEnable(GL_TEXTURE_2D);
         texture = move(Texture(
             FileUtil::getFileDirName(__FILE__) + FileUtil::pathChar + "panda.bmp"));
 
-        textureId = 
-            glGetUniformLocation(myProgramId,"myTextureSampler");
+        textureId =
+            program.getAttr("myTextureSampler");
 
-        vertexPosition= 
-            glGetAttribLocation(myProgramId,"vertexPosition");
-        uvId= 
-            glGetAttribLocation(myProgramId,"uv");
+        vertexPosition=
+            program.getAttr("vertexPosition");
+        uvId=
+            program.getAttr("uv");
 
         //在显卡中申请内存，内存句柄是vertexbuffer
         //VAO创建
@@ -147,7 +141,7 @@ public:
         //习惯性的解绑
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
 
-        this->idMVP = glGetUniformLocation(this->myProgramId,"mvp");
+        this->idMVP = program.getUniform("mvp");
     }
 
     void render(double elapse) override
@@ -160,7 +154,7 @@ public:
         glClearColor(0,0,0.4,1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glUseProgram(this->myProgramId);
+        program.use();
         glEnableVertexAttribArray(vertexPosition);
         glEnableVertexAttribArray(uvId);
 

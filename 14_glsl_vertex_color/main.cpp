@@ -14,7 +14,7 @@ using namespace std;
 class Application: public ApplicationBase
 {
 private:
-    GLuint myProgramId;
+    ShaderProgram program;
     GLuint vertexPosition_modelspaceID;
     GLuint vertexColor_modelspaceID;
     GLuint vertexbuffer;
@@ -29,15 +29,12 @@ public:
     {
         ApplicationBase::init();
         //加载shader
-        myProgramId = loadShader(
-            FileUtil::getFileDirName(__FILE__) + FileUtil::pathChar + VERTEX_FILE_NAME,
-            FileUtil::getFileDirName(__FILE__) + FileUtil::pathChar + FRAG_FILE_NAME
-            );
+        program = loadShader(
+                             FileUtil::getFileDirName(__FILE__) + FileUtil::pathChar + VERTEX_FILE_NAME,
+                             FileUtil::getFileDirName(__FILE__) + FileUtil::pathChar + FRAG_FILE_NAME);
 
-        vertexPosition_modelspaceID = 
-            glGetAttribLocation(myProgramId,"vertexPosition_modelspace");
-        vertexColor_modelspaceID = 
-            glGetAttribLocation(myProgramId,"vertexColor_modelspace");
+        vertexPosition_modelspaceID = program.getAttr("vertexPosition_modelspace");
+        vertexColor_modelspaceID =  program.getAttr("vertexColor_modelspace");
 
         const GLfloat g_vertex_buffer_data[]={
             -1.0f,-1.0f,0.0f,
@@ -85,7 +82,7 @@ public:
         glClear(GL_COLOR_BUFFER_BIT);
 
         //使用shader程序
-        glUseProgram(myProgramId);
+        program.use();
         //启用顶点属性
         glEnableVertexAttribArray(vertexPosition_modelspaceID);
         glBindBuffer(GL_ARRAY_BUFFER,vertexbuffer);

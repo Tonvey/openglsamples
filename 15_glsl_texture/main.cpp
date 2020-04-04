@@ -14,9 +14,8 @@ using namespace std;
 
 class Application: public ApplicationBase
 {
-public:
 private:
-    GLuint myProgramId;
+    ShaderProgram program;
     GLuint vertexPosition_modelspaceID;
     GLuint coord_modelspaceID;
     GLuint vertexbuffer;
@@ -36,10 +35,9 @@ public:
         ApplicationBase::init();
 
         //加载shader
-        myProgramId = loadShader(
-            FileUtil::getFileDirName(__FILE__) + FileUtil::pathChar + VERTEX_FILE_NAME,
-            FileUtil::getFileDirName(__FILE__) + FileUtil::pathChar + FRAG_FILE_NAME
-        );
+        program = loadShader(
+                             FileUtil::getFileDirName(__FILE__) + FileUtil::pathChar + VERTEX_FILE_NAME,
+                             FileUtil::getFileDirName(__FILE__) + FileUtil::pathChar + FRAG_FILE_NAME);
 
         //加载纹理图片
         glEnable(GL_TEXTURE_2D);
@@ -48,12 +46,12 @@ public:
         glEnable(texture.id());
 
 
-        vertexPosition_modelspaceID = 
-            glGetAttribLocation(myProgramId,"vertexPosition");
-        coord_modelspaceID = 
-            glGetAttribLocation(myProgramId,"coord");
-        textureId = 
-            glGetAttribLocation(myProgramId,"myTextureSampler");
+        vertexPosition_modelspaceID =
+            program.getAttr("vertexPosition");
+        coord_modelspaceID =
+            program.getAttr("coord");
+        textureId =
+            program.getAttr("myTextureSampler");
 
         const GLfloat vertexBufferData[]={
             0.0f,0.0f,0.0f,
@@ -97,7 +95,7 @@ public:
         glClear(GL_COLOR_BUFFER_BIT);
 
         //使用shader程序
-        glUseProgram(myProgramId);
+        program.use();
 
         //启用顶点属性
         glEnableVertexAttribArray(vertexPosition_modelspaceID);

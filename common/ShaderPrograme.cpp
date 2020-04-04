@@ -11,19 +11,35 @@ ShaderProgram::~ShaderProgram()
 {
     clear();
 }
+ShaderProgram::ShaderProgram(ShaderProgram &&other)
+{
+    swap(other);
+}
+ShaderProgram &ShaderProgram::operator=(ShaderProgram &&other)
+{
+    clear();
+    swap(other);
+    return *this;
+}
+void ShaderProgram::swap(ShaderProgram &other)
+{
+    GLuint id = mProgramId;
+    mProgramId = other.mProgramId;
+    other.mProgramId = id;
+}
 void ShaderProgram::clear()
 {
-    if(mProgrameId!=0)
+    if(mProgramId!=0)
     {
-        glDeleteProgram(mProgrameId);
-        mProgrameId = 0;
+        glDeleteProgram(mProgramId);
+        mProgramId = 0;
     }
 }
-bool ShaderProgram::IsValid()const
+bool ShaderProgram::isValid()const
 {
-    if(mProgrameId!=0)
+    if(mProgramId!=0)
     {
-        return glIsProgram(mProgrameId) == GL_TRUE;
+        return glIsProgram(mProgramId) == GL_TRUE;
     }
     return false;
 }
@@ -64,10 +80,29 @@ bool ShaderProgram::reset(std::string vertFile, std::string fragFile)
         }
     }
 
+    mProgramId = programId;
     //删除两个shader
     glDetachShader(programId,vert.getShaderID());
     glDetachShader(programId,frag.getShaderID());
     vert.clear();
     frag.clear();
     return true;
+}
+
+void ShaderProgram::use()
+{
+    if(isValid())
+    {
+        glUseProgram(mProgramId);
+    }
+}
+
+GLint ShaderProgram::getAttr(const std::string &attrName)
+{
+    return glGetAttribLocation(mProgramId,attrName.c_str());
+}
+
+GLint ShaderProgram::getUniform(const std::string &uniName)
+{
+    return glGetUniformLocation(mProgramId,uniName.c_str());
 }

@@ -182,52 +182,9 @@ bool ApplicationBase::createFragmentShader(const std::string fileName,GLuint &id
     id = fragShaderId;
     return true;
 }
-GLuint ApplicationBase::loadShader(string vertShaderFile,string fragShaderFile)
+ShaderProgram ApplicationBase::loadShader(string vertShaderFile,string fragShaderFile)
 {
-    //创建顶点shader
-    GLuint vertexShaderId = glCreateShader(GL_VERTEX_SHADER);
-    //创建片段shader
-    GLuint fragShaderId = glCreateShader(GL_FRAGMENT_SHADER);
-
-    if(!createVertexShader(vertShaderFile,vertexShaderId))
-    {
-        cerr<<"Create vertexShader fail"<<endl;
-        exit(-1);
-    }
-    if(!createFragmentShader(fragShaderFile,fragShaderId))
-    {
-        cerr<<"Create fragmentShader fail"<<endl;
-        exit(-1);
-    }
-
-    //创建程序连接两个shader，得到程序id
-    GLuint programId = glCreateProgram();
-    glAttachShader(programId, vertexShaderId);
-    glAttachShader(programId, fragShaderId);
-    glLinkProgram(programId);
-
-    //检查结果
-    GLint result = GL_FALSE;
-    glGetProgramiv(programId,GL_LINK_STATUS,&result);
-    if(result!=GL_TRUE)//编译出错
-    {
-        int infoLogLength;
-        glGetProgramiv(programId,GL_INFO_LOG_LENGTH,&infoLogLength);
-        if(infoLogLength>0)
-        {
-            char *infoLogBuf = new char[infoLogLength+1];
-            unique_ptr<char[]> u(infoLogBuf);
-            infoLogBuf[infoLogLength] = '\0';
-            glGetProgramInfoLog(programId,infoLogLength,NULL,infoLogBuf);
-            cerr<<"Program info : "<<infoLogBuf<<endl;
-            exit(-1);
-        }
-    }
-
-    //删除两个shader
-    glDetachShader(programId,vertexShaderId);
-    glDetachShader(programId,fragShaderId);
-    glDeleteShader(vertexShaderId);
-    glDeleteShader(fragShaderId);
-    return programId;
+    ShaderProgram prog;
+    prog.reset(vertShaderFile,fragShaderFile);
+    return prog;
 }
