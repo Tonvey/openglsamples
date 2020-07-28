@@ -74,6 +74,7 @@ public:
                               GL_FALSE,
                               0,
                               (GLvoid*)0);
+        glBindVertexArray(0);
     }
 
     void render(double elapse) override
